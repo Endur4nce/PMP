@@ -17,14 +17,15 @@ class MainActivity : ComponentActivity() {
         }
         val calculator = Calculator()
         setContent {
-            var showCalculator by rememberSaveable { mutableStateOf(false) }
-            if (showCalculator) {
-                calculator.CalculatorScreen(onBackClick = { showCalculator = false } )
-            } else {
-                MainScreen(
-                    onCalculatorClick = { showCalculator = true },
+            var currentScreen by rememberSaveable { mutableStateOf("Main") }
+            when (currentScreen) {
+                "Main" -> MainScreen(
+                    onCalculatorClick = { currentScreen = "Calculator" },
+                    onGraphClick = { currentScreen = "Graph" },
                     onExitClick = { finish() }
                 )
+                "Calculator" -> calculator.CalculatorScreen(onBackClick = { currentScreen = "Main" })
+                "Graph" -> GraphScreen(onBackClick = { currentScreen = "Main" })
             }
         }
     }

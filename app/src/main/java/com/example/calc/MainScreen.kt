@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.calc.Calculator.ButtonType
 
 @Composable
-fun MainScreen(onCalculatorClick: () -> Unit, onExitClick: () -> Unit) {
+fun MainScreen(onCalculatorClick: () -> Unit, onGraphClick: () -> Unit, onExitClick: () -> Unit) {
     Scaffold(
         containerColor = Color.White // Светлый фон
     ) {
@@ -50,15 +50,12 @@ fun MainScreen(onCalculatorClick: () -> Unit, onExitClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { /* Пока disabled */ },
+                onClick = onGraphClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFCDD2), // Светло-красная
                     contentColor = Color(0xFFD32F2F),   // Тёмно-красный текст
-                    disabledContainerColor = Color(0xFFF8BBD0), // Бледно-розовая
-                    disabledContentColor = Color.Gray
-                ),
-                enabled = false
+                )
             ) {
                 Text(
                     text = "Графики",
