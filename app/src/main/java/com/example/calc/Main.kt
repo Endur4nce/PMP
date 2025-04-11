@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 fun PortraitLayout() {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF121212)
+        color = Color(0xFFFFFFFF)
     ) {
         CalculatorScreen(
             modifier = Modifier
@@ -78,7 +78,7 @@ fun PortraitLayout() {
 fun LandscapeLayout() {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF121212)
+        color = Color(0xFFFFFFFF)
     ) {
         Row(
             modifier = Modifier
@@ -154,7 +154,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFCDDC39), Color(0xFFFFC107), Color(0xFFFF5722))
+                                colors = listOf(Color(0xFFFF5252), Color(0xFFD32F2F), Color(0xFFB71C1C))
                             ),
                             fontSize = 30.sp,
                             textAlign = TextAlign.End
@@ -162,8 +162,8 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color(0xFFFF5722),
-                            unfocusedTextColor = Color(0xFFFF5722)
+                            focusedTextColor = Color(0xFFD32F2F),
+                            unfocusedTextColor = Color(0xFFD32F2F)
                         ),
                         singleLine = true
                     )
@@ -252,7 +252,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(
                         brush = Brush.linearGradient(
-                            colors = listOf(Color(0xFFCDDC39), Color(0xFFFFC107), Color(0xFFFF5722))
+                            colors = listOf(Color(0xFFFF5252), Color(0xFFD32F2F), Color(0xFFB71C1C))
                         ),
                         fontSize = 30.sp,
                         textAlign = TextAlign.End
@@ -260,8 +260,8 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color(0xFFFF5722),
-                        unfocusedTextColor = Color(0xFFFF5722)
+                        focusedTextColor = Color(0xFFD32F2F),
+                        unfocusedTextColor = Color(0xFFD32F2F)
                     ),
                     singleLine = true
                 )
@@ -351,18 +351,18 @@ fun CalcButton(
     val colors = when (buttonType) {
         ButtonType.NUMBER -> ButtonDefaults.buttonColors(
             containerColor = Color(0x00000000),
-            contentColor = Color(0xFFFFFFFF)
+            contentColor = Color(0xFF000000)
         )
         ButtonType.OPERATOR -> ButtonDefaults.buttonColors(
             containerColor = Color(0x00000000),
-            contentColor = Color(0xFFFF5722)
+            contentColor = Color(0xFFD32F2F)
         )
         ButtonType.EQUALS -> ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFFF5722),
+            containerColor = Color(0xFFD32F2F),
             contentColor = Color(0xFF000000)
         )
         ButtonType.HISTORY -> ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFFF5722),
+            containerColor = Color(0xFFD32F2F),
             contentColor = Color(0xFF000000)
         )
     }
@@ -387,7 +387,7 @@ fun CalcButton(
 
 @Composable
 fun HistoryList(history: List<String>) {
-    val gradientColors = listOf(Color(0xFFCDDC39), Color(0xFFFFC107), Color(0xFFFF5722))
+    val gradientColors = listOf(Color(0xFFFF8A80), Color(0xFFE53935), Color(0xFFB71C1C))
     val brush = remember {
         Brush.linearGradient(colors = gradientColors)
     }
@@ -399,8 +399,8 @@ fun HistoryList(history: List<String>) {
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0x006200EE),
-                    contentColor = Color(0xFFFF5722)
+                    containerColor = Color(0x20F44336),
+                    contentColor = Color(0xFFD32F2F)
                 )
             ) {
                 Box(
