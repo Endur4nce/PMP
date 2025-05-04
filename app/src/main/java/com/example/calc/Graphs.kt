@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.objecthunter.exp4j.ExpressionBuilder
+import androidx.compose.ui.platform.LocalContext
 import kotlin.math.*
 
 @Composable
@@ -210,8 +211,44 @@ fun MathKeyboard(onSymbolClick: (String) -> Unit) {
 @Composable
 fun DrawGraph(function: String) {
     if (function.isBlank()) return
+
+    val context = LocalContext.current
+    val dbHelper = remember { SinusoidDatabaseHelper(context) }
+
     val xRange = -10f..10f
     val step = 0.1f
+
+    // Проверим: рисуем только sin(x)
+    if (function.trim() != "sin(x)") {
+        // Можно позже расширить на другие функции
+        return
+    }
+
+    // Очистка таблицы и генерация новых точек синусоиды
+    dbHelper.clearPoints()
+    val points = mutableListOf<Pair<Float, Float>>()
+    for (x in xRange step step) {
+        val y = sin(x.toDouble()).toFloat()
+        dbHelper.insertPoint(x.toDouble(), y.toDouble())
+        points.add(x to y)
+    }
+
+    // Получаем точки обратно (на всякий случай, как будто бы приложение перезапустилось)
+    val dbPoints = dbHelper.getAllPoints().map { it.first.toFloat() to it.second.toFloat() }
+
+    // Определяем экстремумы
+    val extrema = mutableListOf<Pair<Float, Float>>()
+    for (i in 1 until dbPoints.lastIndex) {
+        val (x0, y0) = dbPoints[i - 1]
+        val (x1, y1) = dbPoints[i]
+        val (x2, y2) = dbPoints[i + 1]
+
+        if ((y1 > y0 && y1 > y2) || (y1 < y0 && y1 < y2)) {
+            extrema.add(x1 to y1)
+        }
+    }
+
+    // Рисуем график
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -221,6 +258,8 @@ fun DrawGraph(function: String) {
         val height = size.height
         val centerX = width / 2
         val centerY = height / 2
+
+        // Сетка и оси
         drawRect(color = Color.Black)
         for (i in 0 until width.toInt() step 30) {
             drawLine(
@@ -238,75 +277,24 @@ fun DrawGraph(function: String) {
                 strokeWidth = 1f
             )
         }
-        // Ось X (белая линия с подписями)
-        drawLine(
-            color = Color.Black,
-            start = Offset(0f, centerY),
-            end = Offset(width, centerY),
-            strokeWidth = 2f
-        )
-        // Ось Y (белая линия с подписями)
-        drawLine(
-            color = Color.Black,
-            start = Offset(centerX, 0f),
-            end = Offset(centerX, height),
-            strokeWidth = 2f
-        )
-        // Подписи осей
-        val xLabels = (-10..10 step 2)
-        val yLabels = (-5..5 step 1)
-        // Подписи оси X
-        xLabels.forEach { x ->
-            val xPos = centerX + x * (width / 20f)
-            drawContext.canvas.nativeCanvas.apply {
-                drawText(
-                    x.toString(),
-                    xPos - 10,
-                    centerY + 30,
-                    android.graphics.Paint().apply {
-                        color = android.graphics.Color.BLACK
-                        textSize = 24f
-                    }
-                )
-            }
-        }
-        // Подписи оси Y
-        yLabels.forEach { y ->
-            if (y != 0) {
-                val yPos = centerY - y * (height / 10f)
-                drawContext.canvas.nativeCanvas.apply {
-                    drawText(
-                        y.toString(),
-                        centerX + 10,
-                        yPos + 10,
-                        android.graphics.Paint().apply {
-                            color = android.graphics.Color.BLACK
-                            textSize = 24f
-                        }
-                    )
-                }
-            }
-        }
-        // Отрисовка графика
+
+        drawLine(Color.Black, Offset(0f, centerY), Offset(width, centerY), 2f)
+        drawLine(Color.Black, Offset(centerX, 0f), Offset(centerX, height), 2f)
+
+        // График
         val path = Path()
-        var firstPoint = true
+        var first = true
+        dbPoints.forEach { (x, y) ->
+            val xPx = centerX + x * (width / 20f)
+            val yPx = centerY - y * (height / 10f)
 
-        for (x in xRange step step) {
-            try {
-                val y = evaluateFunctionSafe(function, x.toDouble())?.toFloat() ?: continue
-                val xPixel = centerX + x * (width / 20f)
-                val yPixel = centerY - y * (height / 10f)
+            if (yPx.isNaN() || yPx.isInfinite()) return@forEach
 
-                if (yPixel.isNaN() || yPixel.isInfinite()) continue
-
-                if (firstPoint) {
-                    path.moveTo(xPixel, yPixel)
-                    firstPoint = false
-                } else {
-                    path.lineTo(xPixel, yPixel)
-                }
-            } catch (e: Exception) {
-                firstPoint = true
+            if (first) {
+                path.moveTo(xPx, yPx)
+                first = false
+            } else {
+                path.lineTo(xPx, yPx)
             }
         }
 
@@ -315,6 +303,26 @@ fun DrawGraph(function: String) {
             color = Color(0xFFB71C1C),
             style = Stroke(width = 3f)
         )
+
+        // Отметим экстремумы
+        extrema.forEach { (x, y) ->
+            val xPx = centerX + x * (width / 20f)
+            val yPx = centerY - y * (height / 10f)
+            drawCircle(
+                color = Color.Blue,
+                radius = 8f,
+                center = Offset(xPx, yPx)
+            )
+            drawContext.canvas.nativeCanvas.drawText(
+                String.format("(%.2f, %.2f)", x, y),
+                xPx + 10,
+                yPx - 10, // немного выше
+                android.graphics.Paint().apply {
+                    color = android.graphics.Color.WHITE
+                    textSize = 28f
+                }
+            )
+        }
     }
 }
 
